@@ -60,7 +60,8 @@ RUN mkdir -p rootfs/etc/systemd/system/systemd-timesyncd.service.d && \
     printf "[Unit]\nConditionVirtualization=\n" > rootfs/etc/systemd/system/systemd-timesyncd.service.d/override.conf
 
 # Disable bootloader-config service (not needed for SD card boot)
-RUN chroot rootfs /bin/bash -c "systemctl mask nv-l4t-bootloader-config.service"
+RUN rm -f rootfs/etc/systemd/system/nv-l4t-bootloader-config.service && \
+    ln -sf /dev/null rootfs/etc/systemd/system/nv-l4t-bootloader-config.service
 
 # Set newgrp setuid bit
 RUN chmod 4755 rootfs/usr/bin/newgrp
