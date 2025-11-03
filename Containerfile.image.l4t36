@@ -55,8 +55,18 @@ RUN rm -rf /build/Linux_for_Tegra/nv_tegra/l4t_deb_packages/nvidia-l4t-nvpmodel-
 WORKDIR /build/Linux_for_Tegra/
 RUN ./apply_binaries.sh
 
-# Fix permissions
-RUN chroot /build/Linux_for_Tegra/rootfs/ /bin/bash -c "chown -R jetson:jetson /home/jetson && chmod 1777 /tmp"
+# systemd-timesyncd container detection override
+RUN mkdir -p rootfs/etc/systemd/system/systemd-timesyncd.service.d && \
+    printf "[Unit]\nConditionVirtualization=\n" > rootfs/etc/systemd/system/systemd-timesyncd.service.d/override.conf
+
+# Disable bootloader-config service (not needed for SD card boot)
+RUN chroot rootfs /bin/bash -c "systemctl mask nv-l4t-bootloader-config.service"
+
+# Set newgrp setuid bit
+RUN chmod 4755 rootfs/usr/bin/newgrp
+
+# Fix permissions and ownership
+RUN chroot rootfs /bin/bash -c "chown -R jetson:jetson /home/jetson && chmod 1777 /tmp"
 
 # L4T packages
 RUN mount -t proc proc rootfs/proc/ && \
