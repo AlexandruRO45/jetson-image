@@ -113,7 +113,7 @@ RUN systemctl enable resizerootfs.service && \
 # password: jetson
 RUN useradd \
         --create-home \
-        -G sudo,video,audio \
+        -G sudo,video,audio,render \
         -p $(openssl passwd -6 jetson) \
         -s /bin/bash \
         jetson

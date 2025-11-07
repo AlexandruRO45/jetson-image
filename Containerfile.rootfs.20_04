@@ -70,6 +70,13 @@ RUN apt install -y \
         e2fsprogs \
         mtd-utils
 
+# Essential networking packages
+RUN apt install -y \
+        network-manager \
+        wireless-tools \
+        iw \
+        rfkill \
+        openssh-server
 
 RUN wget -q https://github.com/pythops/tegratop/releases/latest/download/tegratop-linux-arm64 -O /usr/local/bin/tegratop && \
     chmod +x /usr/local/bin/tegratop
@@ -84,16 +91,17 @@ RUN locale-gen en_US.UTF-8
 # Network configuration
 COPY config/netcfg.yaml /etc/netplan/netcfg.yaml
 
-# Enable services at startuo
+# Enable services at startup
 RUN systemctl enable resizerootfs.service && \
-    systemctl enable systemd-timesyncd
-
+    systemctl enable systemd-timesyncd && \
+    systemctl enable NetworkManager && \
+    systemctl enable ssh
 # New user
 # username: jetson
 # password: jetson
 RUN useradd \
         --create-home \
-        -G sudo,video,audio \
+        -G sudo,video,audio,render \
         -p $(openssl passwd -6 jetson) \
         -s /bin/bash \
         jetson
