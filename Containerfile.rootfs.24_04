@@ -1,4 +1,5 @@
 FROM ubuntu:noble
+ARG DEBIAN_FRONTEND=noninteractive
 
 LABEL org.opencontainers.image.authors="Badr @pythops"
 
